@@ -1,0 +1,100 @@
+# Services
+services:
+  # PostgreSql Service
+  postgre:
+    container_name: postgre-container
+    image: postgres:18.6-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      # - ./.docker/postgresql/main/postgresql.cnf:/etc/postgresql/main/postgresql.cnf
+      - postgredata:/var/lib/postgresql
+    networks:
+      cosmetic-store-network:
+        ipv4_address: 192.168.5.2
+
+  # Node->Angular Service
+  # node:
+  #   container_name: node-container
+  #   build:
+  #       context: ./fe-cosmetic
+  #       dockerfile: Dockerfile
+  #   volumes:
+  #     - ./fe-cosmetic:/app
+  #   #   - /app/node_modules
+  #   #   - /app/.next
+  #   ports:
+  #       - "4200:4200"
+
+  # cosmetic:
+  #   container_name: cosmetic_store-container
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8113:8113"
+  #   volumes:
+  #     - ./tmp:/tmp
+  #     - ./uploads:/uploads
+  #   networks:
+  #     cosmetic-store-network:
+  #       ipv4_address: 192.168.5.2
+
+  # Nginx Service
+  # nginx:
+  #   container_name: nginx-container
+  #   image: nginx:1.27-alpine
+  #   ports:
+  #     - 80:80
+  #   volumes:
+  #     - ./.docker/nginx/conf.d:/etc/nginx/conf.d
+  #   networks:
+  #     cosmetic-store-network:
+  #       ipv4_address: 192.168.5.2
+  #   # depends_on:
+  #   #   - php
+  #   #   - phpmyadmin
+
+
+  #Grafana OTEL Service for telemetry
+#  grafana:
+#    container_name: grafana-container
+#    image: 'grafana/otel-lgtm:0.18.1'
+#    ports:
+#      - '3000:3000'
+#      - '4317:4317'
+#      - '4318:4318'
+#    networks:
+#      cosmetic-store-network:
+#        ipv4_address: 192.168.5.3
+#
+#  #Redis Service for OTT
+#  redis:
+#    container_name: redis-container
+#    image: redis:8.6.0-alpine
+#    ports:
+#      - 6379:6379
+#    command: --requirepass ${REDIS_PASSWORD}
+#    # volumes:
+#    #   - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      cosmetic-store-network:
+#        ipv4_address: 192.168.5.4
+
+# Volumes
+volumes:
+  postgredata:
+
+#Networks
+networks:
+  cosmetic-store-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.5.0/24
+          gateway: 192.168.5.1

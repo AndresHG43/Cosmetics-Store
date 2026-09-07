@@ -1,0 +1,255 @@
+Table user [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	name varchar [ not null ]
+	lastname varchar [ not null ]
+	email varchar [ not null, unique ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'user_index_0' ]
+	}
+}
+
+Table product [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	name varchar [ not null ]
+	description varchar [ not null ]
+	price numeric [ not null ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'producto_index_0' ]
+	}
+}
+
+Table sale [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	date timestamp [ not null ]
+	total numeric
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'sale_index_0' ]
+	}
+}
+
+Table purchase [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	date timestamp [ not null ]
+	total numeric
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'purchase_index_0' ]
+	}
+}
+
+Table sale_detail [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	sale_id bigint [ pk, not null ]
+	product_id bigint [ pk, not null ]
+	price_sale numeric [ not null ]
+	quantity integer [ not null ]
+	subtotal numeric [ not null ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'sale_detail_index_0' ]
+	}
+}
+
+Table purchase_detail [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	purchase_id bigint [ pk, not null ]
+	product_id bigint [ pk, not null ]
+	price_purchase numeric [ not null ]
+	quantity integer [ not null ]
+	subtotal numeric [ not null ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'purchase_detail_index_0' ]
+	}
+}
+
+Table roles [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	name varchar [ not null ]
+	description varchar [ not null ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'roles_index_0' ]
+	}
+}
+
+Table user_roles [headercolor: #175e7a] {
+	id bigint [ pk, increment, not null, unique ]
+	user_id bigint [ not null ]
+	role_id bigint [ not null ]
+	date_created timestamp [ not null ]
+	date_updated timestamp
+	date_deleted timestamp
+	user_created bigint [ not null ]
+	user_updated bigint
+	user_deleted bigint
+
+	indexes {
+		(id) [ name: 'user_roles_index_0' ]
+	}
+}
+
+Ref fk_product_id_sale_detail {
+	product.id < sale_detail.product_id [ delete: no action, update: no action ]
+}
+
+Ref fk_product_id_purchase_detail {
+	product.id < purchase_detail.product_id [ delete: no action, update: no action ]
+}
+
+Ref fk_sale_id_sale_detail {
+	sale.id < sale_detail.sale_id [ delete: no action, update: no action ]
+}
+
+Ref fk_purchase_id_purchase_detail {
+	purchase.id < purchase_detail.purchase_id [ delete: no action, update: no action ]
+}
+
+Ref fk_user_roles_user_id_user {
+	user_roles.user_id > user.id [ delete: no action, update: no action ]
+}
+
+Ref fk_user_roles_role_id_roles {
+	user_roles.role_id > roles.id [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_created {
+	user.id < sale.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_updated {
+	user.id < sale.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_deleted {
+	user.id < sale.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_detail_created {
+	user.id < sale_detail.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_detail_updated {
+	user.id < sale_detail.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_sale_detail_deleted {
+	user.id < sale_detail.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_product_created {
+	user.id < product.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_product_updated {
+	user.id < product.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_product_deleted {
+	user.id < product.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_created {
+	user.id < purchase.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_updated {
+	user.id < purchase.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_deleted {
+	user.id < purchase.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_detail_created {
+	user.id < purchase_detail.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_detail_updated {
+	user.id < purchase_detail.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_purchase_detail_deleted {
+	user.id < purchase_detail.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_roles_created {
+	user.id < user_roles.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_roles_updated {
+	user.id < user_roles.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_roles_deleted {
+	user.id < user_roles.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_roles_created {
+	user.id < roles.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_roles_updated {
+	user.id < roles.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_roles_deleted {
+	user.id < roles.user_deleted [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_created {
+	user.id < user.user_created [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_updated {
+	user.id < user.user_updated [ delete: no action, update: no action ]
+}
+
+Ref fk_user_id_user_deleted {
+	user.id < user.user_deleted [ delete: no action, update: no action ]
+}
