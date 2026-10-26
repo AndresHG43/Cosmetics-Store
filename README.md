@@ -55,4 +55,3 @@
 
 ### Useful commands 
 - `docker compose down -v --rmi all --remove-orphans` for completly drop of the containers
-- `./gradlew sonar -Dsonar.projectKey=cosmetic -Dsonar.projectName='cosmetic' -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_ad9c23a45145165ec5cbfcc09e19069e0de35e4b`

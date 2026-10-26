@@ -66,7 +66,7 @@ class RoleControllerTest {
 
         when(roleService.create(any(RoleCreateRequest.class))).thenReturn(sampleRoleResponse);
 
-        mockMvc.perform(post("/cosmetic/api/roles")
+        mockMvc.perform(post("/cosmetic/api/role")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -78,7 +78,7 @@ class RoleControllerTest {
     void testGetRoleById_Success() throws Exception {
         when(roleService.getById(1L)).thenReturn(sampleRoleResponse);
 
-        mockMvc.perform(get("/cosmetic/api/roles/1"))
+        mockMvc.perform(get("/cosmetic/api/role/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
@@ -88,7 +88,7 @@ class RoleControllerTest {
     void testGetRoleById_NotFound() throws Exception {
         when(roleService.getById(99L)).thenThrow(new ResourceNotFoundException("Role not found"));
 
-        mockMvc.perform(get("/cosmetic/api/roles/99"))
+        mockMvc.perform(get("/cosmetic/api/role/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false));
     }
@@ -100,7 +100,7 @@ class RoleControllerTest {
         );
         when(roleService.getAll(any(Pageable.class))).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/cosmetic/api/roles")
+        mockMvc.perform(get("/cosmetic/api/role")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -117,7 +117,7 @@ class RoleControllerTest {
 
         when(roleService.update(eq(1L), any(RoleUpdateRequest.class))).thenReturn(sampleRoleResponse);
 
-        mockMvc.perform(put("/cosmetic/api/roles/1")
+        mockMvc.perform(put("/cosmetic/api/role/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -126,7 +126,7 @@ class RoleControllerTest {
 
     @Test
     void testDeleteRole_Success() throws Exception {
-        mockMvc.perform(delete("/cosmetic/api/roles/1"))
+        mockMvc.perform(delete("/cosmetic/api/role/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

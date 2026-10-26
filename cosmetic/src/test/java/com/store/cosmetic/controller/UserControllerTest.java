@@ -70,7 +70,7 @@ class UserControllerTest {
 
         when(userService.create(any(UserCreateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(post("/cosmetic/api/users")
+        mockMvc.perform(post("/cosmetic/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -87,7 +87,7 @@ class UserControllerTest {
                 .password("123") // too short
                 .build();
 
-        mockMvc.perform(post("/cosmetic/api/users")
+        mockMvc.perform(post("/cosmetic/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -106,7 +106,7 @@ class UserControllerTest {
         when(userService.create(any(UserCreateRequest.class)))
                 .thenThrow(new ConflictException("Email already exists"));
 
-        mockMvc.perform(post("/cosmetic/api/users")
+        mockMvc.perform(post("/cosmetic/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
@@ -117,7 +117,7 @@ class UserControllerTest {
     void testGetUserById_Success() throws Exception {
         when(userService.getById(1L)).thenReturn(sampleResponse);
 
-        mockMvc.perform(get("/cosmetic/api/users/1"))
+        mockMvc.perform(get("/cosmetic/api/user/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
@@ -127,7 +127,7 @@ class UserControllerTest {
     void testGetUserById_NotFound() throws Exception {
         when(userService.getById(99L)).thenThrow(new ResourceNotFoundException("User not found"));
 
-        mockMvc.perform(get("/cosmetic/api/users/99"))
+        mockMvc.perform(get("/cosmetic/api/user/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false));
     }
@@ -139,7 +139,7 @@ class UserControllerTest {
         );
         when(userService.getAll(eq("ana"), any())).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/cosmetic/api/users")
+        mockMvc.perform(get("/cosmetic/api/user")
                         .param("search", "ana")
                         .param("page", "0")
                         .param("size", "10"))
@@ -158,7 +158,7 @@ class UserControllerTest {
 
         when(userService.update(eq(1L), any(UserUpdateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(put("/cosmetic/api/users/1")
+        mockMvc.perform(put("/cosmetic/api/user/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -167,7 +167,7 @@ class UserControllerTest {
 
     @Test
     void testDeleteUser_Success() throws Exception {
-        mockMvc.perform(delete("/cosmetic/api/users/1"))
+        mockMvc.perform(delete("/cosmetic/api/user/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

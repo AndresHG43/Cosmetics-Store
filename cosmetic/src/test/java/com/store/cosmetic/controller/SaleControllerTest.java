@@ -74,7 +74,7 @@ class SaleControllerTest {
 
         when(saleService.create(any(SaleCreateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(post("/cosmetic/api/sales")
+        mockMvc.perform(post("/cosmetic/api/sale")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -86,7 +86,7 @@ class SaleControllerTest {
     void testGetSaleById_Success() throws Exception {
         when(saleService.getById(1L)).thenReturn(sampleResponse);
 
-        mockMvc.perform(get("/cosmetic/api/sales/1"))
+        mockMvc.perform(get("/cosmetic/api/sale/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
@@ -99,7 +99,7 @@ class SaleControllerTest {
         );
         when(saleService.getAll(any())).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/cosmetic/api/sales")
+        mockMvc.perform(get("/cosmetic/api/sale")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -111,7 +111,7 @@ class SaleControllerTest {
         StatusUpdateRequest request = StatusUpdateRequest.builder().statusId(2L).build();
         when(saleService.updateStatus(eq(1L), any(StatusUpdateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(put("/cosmetic/api/sales/1/status")
+        mockMvc.perform(put("/cosmetic/api/sale/1/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -120,7 +120,7 @@ class SaleControllerTest {
 
     @Test
     void testDeleteSale_Success() throws Exception {
-        mockMvc.perform(delete("/cosmetic/api/sales/1"))
+        mockMvc.perform(delete("/cosmetic/api/sale/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

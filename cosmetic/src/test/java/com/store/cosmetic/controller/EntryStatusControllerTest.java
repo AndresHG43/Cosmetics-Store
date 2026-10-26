@@ -39,7 +39,7 @@ class EntryStatusControllerTest {
         EntryStatusResponse res = EntryStatusResponse.builder().id(1L).status("IN PROGRESS").build();
         when(entryService.getAllStatuses()).thenReturn(List.of(res));
 
-        mockMvc.perform(get("/cosmetic/api/entry-statuses"))
+        mockMvc.perform(get("/cosmetic/api/entry-status"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].status").value("IN PROGRESS"));
@@ -50,7 +50,7 @@ class EntryStatusControllerTest {
         EntryStatusResponse res = EntryStatusResponse.builder().id(1L).status("IN PROGRESS").build();
         when(entryService.getStatusById(1L)).thenReturn(res);
 
-        mockMvc.perform(get("/cosmetic/api/entry-statuses/1"))
+        mockMvc.perform(get("/cosmetic/api/entry-status/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));

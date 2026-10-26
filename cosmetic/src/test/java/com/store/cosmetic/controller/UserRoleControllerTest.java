@@ -64,7 +64,7 @@ class UserRoleControllerTest {
 
         when(userRoleService.assign(any(UserRoleCreateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(post("/cosmetic/api/users-roles")
+        mockMvc.perform(post("/cosmetic/api/users-role")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -76,7 +76,7 @@ class UserRoleControllerTest {
     void testGetById_Success() throws Exception {
         when(userRoleService.getById(1L)).thenReturn(sampleResponse);
 
-        mockMvc.perform(get("/cosmetic/api/users-roles/1"))
+        mockMvc.perform(get("/cosmetic/api/users-role/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
@@ -89,7 +89,7 @@ class UserRoleControllerTest {
         );
         when(userRoleService.getAll(any(Pageable.class))).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/cosmetic/api/users-roles")
+        mockMvc.perform(get("/cosmetic/api/users-role")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -99,7 +99,7 @@ class UserRoleControllerTest {
 
     @Test
     void testRevokeRole_Success() throws Exception {
-        mockMvc.perform(delete("/cosmetic/api/users-roles/1"))
+        mockMvc.perform(delete("/cosmetic/api/users-role/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

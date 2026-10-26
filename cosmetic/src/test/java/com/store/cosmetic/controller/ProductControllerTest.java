@@ -73,7 +73,7 @@ class ProductControllerTest {
 
         when(productService.create(any(ProductCreateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(post("/cosmetic/api/products")
+        mockMvc.perform(post("/cosmetic/api/product")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -85,7 +85,7 @@ class ProductControllerTest {
     void testGetProductById_Success() throws Exception {
         when(productService.getById(1L)).thenReturn(sampleResponse);
 
-        mockMvc.perform(get("/cosmetic/api/products/1"))
+        mockMvc.perform(get("/cosmetic/api/product/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
@@ -101,7 +101,7 @@ class ProductControllerTest {
 
         when(stockService.calculateStock(1L)).thenReturn(stockResponse);
 
-        mockMvc.perform(get("/cosmetic/api/products/1/stock"))
+        mockMvc.perform(get("/cosmetic/api/product/1/stock"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.stock").value(42));
@@ -111,7 +111,7 @@ class ProductControllerTest {
     void testGetProductById_NotFound() throws Exception {
         when(productService.getById(99L)).thenThrow(new ResourceNotFoundException("Product not found"));
 
-        mockMvc.perform(get("/cosmetic/api/products/99"))
+        mockMvc.perform(get("/cosmetic/api/product/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false));
     }
@@ -123,7 +123,7 @@ class ProductControllerTest {
         );
         when(productService.getAll(any(), any(), any())).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/cosmetic/api/products")
+        mockMvc.perform(get("/cosmetic/api/product")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -141,7 +141,7 @@ class ProductControllerTest {
 
         when(productService.update(eq(1L), any(ProductUpdateRequest.class))).thenReturn(sampleResponse);
 
-        mockMvc.perform(put("/cosmetic/api/products/1")
+        mockMvc.perform(put("/cosmetic/api/product/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -150,7 +150,7 @@ class ProductControllerTest {
 
     @Test
     void testDeleteProduct_Success() throws Exception {
-        mockMvc.perform(delete("/cosmetic/api/products/1"))
+        mockMvc.perform(delete("/cosmetic/api/product/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

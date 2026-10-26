@@ -39,7 +39,7 @@ class SaleStatusControllerTest {
         SaleStatusResponse res = SaleStatusResponse.builder().id(1L).status("DONE").build();
         when(saleService.getAllStatuses()).thenReturn(List.of(res));
 
-        mockMvc.perform(get("/cosmetic/api/sale-statuses"))
+        mockMvc.perform(get("/cosmetic/api/sale-status"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].status").value("DONE"));
@@ -50,7 +50,7 @@ class SaleStatusControllerTest {
         SaleStatusResponse res = SaleStatusResponse.builder().id(1L).status("DONE").build();
         when(saleService.getStatusById(1L)).thenReturn(res);
 
-        mockMvc.perform(get("/cosmetic/api/sale-statuses/1"))
+        mockMvc.perform(get("/cosmetic/api/sale-status/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1));
