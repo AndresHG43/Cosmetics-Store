@@ -5,9 +5,16 @@
 - Copy the `application.example.yml` file to an `application.yml` file int `authorization/src/main/resources` route.
 - Fill the `.env.example` file with the database's credentials.
   - It's recommended that the root password variable be different from that of the read user.
-- Create the keys to encrypt the jwt.
-  - With Openssl, run: `openssl genrsa > private.key 2048` and `openssl rsa -in private.key -pubout -out public.key`.
-  - Copy the files into `store/src/main/resources`.
+- Create the RSA keys (PKCS#8 PEM format) for JWT encryption/signing:
+  - Generate the private key in PKCS#8 format:
+    ```bash
+    openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+    ```
+  - Extract the public key in X.509 format:
+    ```bash
+    openssl rsa -pubout -in private_key.pem -out public_key.pem
+    ```
+  - Copy both files (`private_key.pem` and `public_key.pem`) into `cosmetic/src/main/resources/keys/`.
 - Execute `docker compose pull` and later `docker compose up -d` commands.
 - Run the `initDataBase.sh` file with `./initDataBase.sh` command.
 - Run the `InitUserDb.sh` file with `./InitUserDb.sh` command.
@@ -23,9 +30,16 @@
 - Fill the `.env.example` file with the database's credentials.
   - It's recommended that the root password variable be different from that of the read user.
 - Execute `docker compose pull` and later `docker compose up -d` commands.
-- Create the keys to encrypt the jwt.
-  - With Openssl, run: `openssl genrsa > private.key 2048` and `openssl rsa -in private.key -pubout -out public.key`.
-  - Copy the files into `authorization/src/main/resources`.
+- Create the RSA keys (PKCS#8 PEM format) for JWT encryption/signing:
+  - Generate the private key in PKCS#8 format:
+    ```cmd
+    openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+    ```
+  - Extract the public key in X.509 format:
+    ```cmd
+    openssl rsa -pubout -in private_key.pem -out public_key.pem
+    ```
+  - Copy both files (`private_key.pem` and `public_key.pem`) into `cosmetic/src/main/resources/keys/`.
 - Run the `initDataBase.bat` file.
 - Run the `InitUserDb.bat` file.
 - Replace the username and password fields in the `application.yml` file for `POSTGRES_READ_USER` and `POSTGRES_READ_PASSWORD` env values.
@@ -36,11 +50,9 @@
 
 ### About Application 
 - JDK 25
-- PostgreSQL 17
-- NginX 1.27
-- SpringBoot 4.0.2
-- Redis 8.6.0
-- Node 24.12.0 (LTS)
+- PostgreSQL 18.6
+- SpringBoot 4.1.1
 
 ### Useful commands 
 - `docker compose down -v --rmi all --remove-orphans` for completly drop of the containers
+- `./gradlew sonar -Dsonar.projectKey=cosmetic -Dsonar.projectName='cosmetic' -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_ad9c23a45145165ec5cbfcc09e19069e0de35e4b`

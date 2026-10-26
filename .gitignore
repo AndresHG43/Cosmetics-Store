@@ -28,3 +28,6 @@ openspec
 openSpecInstall.md
 .agents
 *.tar
+*.pem
+private_key.pem
+public_key.pem
