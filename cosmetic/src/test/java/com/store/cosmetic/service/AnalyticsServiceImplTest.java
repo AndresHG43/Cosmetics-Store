@@ -8,7 +8,6 @@ import com.store.cosmetic.repository.SaleDetailRepository;
 import com.store.cosmetic.repository.SaleRepository;
 import com.store.cosmetic.service.implementation.AnalyticsServiceImpl;
 import com.store.cosmetic.util.PageResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,6 +1,7 @@
 package com.store.cosmetic.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.store.cosmetic.config.DateTimeConfig;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     @Builder.Default
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp = LocalDateTime.now(DateTimeConfig.APP_ZONE);
 
     public static <T> ApiResponse<T> ok(T data) {
         return ApiResponse.<T>builder()

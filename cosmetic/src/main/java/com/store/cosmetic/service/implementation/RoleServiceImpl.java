@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.RoleCreateRequest;
 import com.store.cosmetic.domain.dto.request.RoleUpdateRequest;
 import com.store.cosmetic.domain.dto.response.RoleResponse;
@@ -22,6 +23,8 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
     private final jakarta.servlet.http.HttpServletRequest httpServletRequest;
+
+    private static final String ROLE_NOT_FOUND = "Role not found with id: ";
 
     public RoleServiceImpl(RoleRepository roleRepository,
                            RoleMapper roleMapper,
@@ -59,7 +62,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public RoleResponse getById(Long id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ROLE_NOT_FOUND + id));
         return roleMapper.toResponse(role);
     }
 
@@ -73,7 +76,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public RoleResponse update(Long id, RoleUpdateRequest request) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ROLE_NOT_FOUND + id));
         if (!role.getName().equals(request.getName()) && roleRepository.existsByName(request.getName())) {
             throw new ConflictException("Role with name '" + request.getName() + "' already exists");
         }
@@ -88,9 +91,9 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public void delete(Long id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ROLE_NOT_FOUND + id));
         role.setActive(false);
-        role.setDateDeleted(LocalDateTime.now());
+        role.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         role.setUserDeleted(getAuthenticatedUserId());
         roleRepository.save(role);
     }

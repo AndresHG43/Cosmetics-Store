@@ -1,7 +1,6 @@
 package com.store.cosmetic.service;
 
 import com.store.cosmetic.service.implementation.JwtServiceImpl;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +9,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.Field;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;

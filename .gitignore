@@ -31,3 +31,6 @@ openSpecInstall.md
 *.pem
 private_key.pem
 public_key.pem
+
+uiux/
+wireframes/

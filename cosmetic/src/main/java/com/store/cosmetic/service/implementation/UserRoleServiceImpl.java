@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.UserRoleCreateRequest;
 import com.store.cosmetic.domain.dto.response.UserRoleResponse;
 import com.store.cosmetic.domain.mapper.UserRoleMapper;
@@ -92,7 +93,7 @@ public class UserRoleServiceImpl implements UserRoleService {
         UserRole userRole = userRoleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UserRole not found with id: " + id));
         userRole.setActive(false);
-        userRole.setDateDeleted(LocalDateTime.now());
+        userRole.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         userRole.setUserDeleted(getAuthenticatedUserId());
         userRoleRepository.save(userRole);
     }

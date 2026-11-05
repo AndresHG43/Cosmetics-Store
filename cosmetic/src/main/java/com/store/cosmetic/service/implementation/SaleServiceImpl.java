@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.SaleCreateRequest;
 import com.store.cosmetic.domain.dto.request.StatusUpdateRequest;
 import com.store.cosmetic.domain.dto.response.SaleResponse;
@@ -19,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class SaleServiceImpl implements SaleService {
@@ -30,6 +30,9 @@ public class SaleServiceImpl implements SaleService {
     private final ProductRepository productRepository;
     private final SaleMapper saleMapper;
     private final jakarta.servlet.http.HttpServletRequest httpServletRequest;
+
+    private static final String SALE_STATUS_NOT_FOUND = "Sale status not found with id: ";
+    private static final String SALE_NOT_FOUND = "Sale not found with id: ";
 
     public SaleServiceImpl(SaleRepository saleRepository,
                            SaleDetailRepository saleDetailRepository,
@@ -57,17 +60,17 @@ public class SaleServiceImpl implements SaleService {
     @Transactional
     public SaleResponse create(SaleCreateRequest request) {
         SaleStatus status = saleStatusRepository.findById(request.getStatusId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sale status not found with id: " + request.getStatusId()));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_STATUS_NOT_FOUND + request.getStatusId()));
 
         Long currentUserId = getAuthenticatedUserId();
 
         LocalDateTime saleDate = request.getDate();
-        if (saleDate == null) {
-            if (Long.valueOf(2L).equals(status.getId()) || Long.valueOf(3L).equals(status.getId())
-                    || "PENDING DELIVERY".equalsIgnoreCase(status.getStatus())
-                    || "DONE".equalsIgnoreCase(status.getStatus())) {
-                saleDate = LocalDateTime.now();
-            }
+        if (saleDate == null &&
+                (Long.valueOf(2L).equals(status.getId()) || Long.valueOf(3L).equals(status.getId())
+                        || "PENDING DELIVERY".equalsIgnoreCase(status.getStatus())
+                        || "DONE".equalsIgnoreCase(status.getStatus()))) {
+
+            saleDate = LocalDateTime.now(DateTimeConfig.APP_ZONE);
         }
 
         Sale sale = Sale.builder()
@@ -115,7 +118,7 @@ public class SaleServiceImpl implements SaleService {
     @Transactional(readOnly = true)
     public SaleResponse getById(Long id) {
         Sale sale = saleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_NOT_FOUND + id));
         List<SaleDetail> details = saleDetailRepository.findBySaleId(id);
         return saleMapper.toResponse(sale, details);
     }
@@ -135,9 +138,9 @@ public class SaleServiceImpl implements SaleService {
     @Transactional
     public SaleResponse updateStatus(Long id, StatusUpdateRequest request) {
         Sale sale = saleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_NOT_FOUND + id));
         SaleStatus status = saleStatusRepository.findById(request.getStatusId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sale status not found with id: " + request.getStatusId()));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_STATUS_NOT_FOUND + request.getStatusId()));
         Long currentUserId = getAuthenticatedUserId();
         sale.setStatus(status);
         sale.setUserUpdated(currentUserId);
@@ -146,9 +149,9 @@ public class SaleServiceImpl implements SaleService {
                 || "PENDING DELIVERY".equalsIgnoreCase(status.getStatus())
                 || "DONE".equalsIgnoreCase(status.getStatus()))
                 && sale.getDate() == null) {
-            sale.setDate(LocalDateTime.now());
+            sale.setDate(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         } else if (Long.valueOf(4L).equals(status.getId()) || "DELETED".equalsIgnoreCase(status.getStatus())) {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(DateTimeConfig.APP_ZONE);
             sale.setActive(false);
             sale.setDateDeleted(now);
             sale.setUserDeleted(currentUserId);
@@ -171,13 +174,13 @@ public class SaleServiceImpl implements SaleService {
     @Transactional
     public void delete(Long id) {
         Sale sale = saleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_NOT_FOUND + id));
 
         SaleStatus status = saleStatusRepository.findById(4L)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale status not found with id: " + 4));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_STATUS_NOT_FOUND + 4));
 
         Long currentUserId = getAuthenticatedUserId();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(DateTimeConfig.APP_ZONE);
 
         sale.setStatus(status);
         sale.setActive(false);
@@ -206,7 +209,7 @@ public class SaleServiceImpl implements SaleService {
     @Transactional(readOnly = true)
     public SaleStatusResponse getStatusById(Long id) {
         SaleStatus status = saleStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale status not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(SALE_STATUS_NOT_FOUND + id));
         return saleMapper.toStatusResponse(status);
     }
 }

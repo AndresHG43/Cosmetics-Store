@@ -1,5 +1,6 @@
 package com.store.cosmetic.specification;
 
+import com.store.cosmetic.exception.ConflictException;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 
@@ -8,6 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NormalizeSpecification {
+    private NormalizeSpecification() {
+        throw new UnsupportedOperationException("This class should never be instantiated");
+    }
+
     private static final Map<Character, Character> CHARACTER_MAP = new HashMap<>();
     static {
         String origin = "áãàâäçéèëêùûüúóôöïîíÁÀÂÄÃÇÉÈËÊÙÛÜÚÓÔÖÏÎÍñÑ";
@@ -37,7 +42,12 @@ public class NormalizeSpecification {
 
     public static Predicate normalizedContains(Expression<String> expression, String value, jakarta.persistence.criteria.CriteriaBuilder cb) {
         Expression<String> normalizedField = cb.function("unaccent", String.class, cb.lower(expression));
-        String valueNorm = normalize(value).toLowerCase();
-        return cb.like(normalizedField, "%" + valueNorm + "%");
+        if (value != null) {
+            String valueNorm = normalize(value).toLowerCase();
+            return cb.like(normalizedField, "%" + valueNorm + "%");
+        }
+        else {
+            throw new ConflictException("Search value can not be null");
+        }
     }
 }

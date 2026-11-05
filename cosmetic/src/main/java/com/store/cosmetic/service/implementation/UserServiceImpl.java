@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.UserCreateRequest;
 import com.store.cosmetic.domain.dto.request.UserUpdateRequest;
 import com.store.cosmetic.domain.dto.response.UserResponse;
@@ -35,6 +36,8 @@ public class UserServiceImpl implements UserService {
     private final UserRoleRepository userRoleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+
+    private static final String USER_STATUS_NOT_FOUND = "User not found with id: ";
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
@@ -84,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_STATUS_NOT_FOUND + id));
         List<UserRole> userRoles = userRoleRepository.findByUserIdAndActiveTrue(id);
         return userMapper.toResponse(user, userRoles);
     }
@@ -105,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse update(Long id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_STATUS_NOT_FOUND + id));
         if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
             throw new ConflictException("Email '" + request.getEmail() + "' is already in use");
         }
@@ -121,9 +124,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_STATUS_NOT_FOUND + id));
         user.setActive(false);
-        user.setDateDeleted(LocalDateTime.now());
+        user.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         userRepository.save(user);
     }
 

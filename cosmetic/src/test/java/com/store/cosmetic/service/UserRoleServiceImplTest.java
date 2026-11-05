@@ -7,7 +7,6 @@ import com.store.cosmetic.domain.model.Role;
 import com.store.cosmetic.domain.model.User;
 import com.store.cosmetic.domain.model.UserRole;
 import com.store.cosmetic.exception.ConflictException;
-import com.store.cosmetic.exception.ResourceNotFoundException;
 import com.store.cosmetic.repository.RoleRepository;
 import com.store.cosmetic.repository.UserRepository;
 import com.store.cosmetic.repository.UserRoleRepository;

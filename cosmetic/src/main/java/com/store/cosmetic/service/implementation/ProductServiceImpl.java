@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.ProductCreateRequest;
 import com.store.cosmetic.domain.dto.request.ProductUpdateRequest;
 import com.store.cosmetic.domain.dto.response.ProductResponse;
@@ -26,6 +27,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final jakarta.servlet.http.HttpServletRequest httpServletRequest;
+
+    private static final String PRODUCT_NOT_FOUND = "Product not found with id: ";
 
     public ProductServiceImpl(ProductRepository productRepository,
                               ProductMapper productMapper,
@@ -60,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getById(Long id) {
         Product product = productRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND + id));
         return productMapper.toResponse(product);
     }
 
@@ -77,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse update(Long id, ProductUpdateRequest request) {
         Product product = productRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND + id));
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         if (request.getPrice() != null) {
@@ -91,9 +94,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void delete(Long id) {
         Product product = productRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND + id));
         product.setActive(false);
-        product.setDateDeleted(LocalDateTime.now());
+        product.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         product.setUserDeleted(getAuthenticatedUserId());
         productRepository.save(product);
     }

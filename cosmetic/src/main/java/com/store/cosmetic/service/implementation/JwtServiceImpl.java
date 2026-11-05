@@ -9,10 +9,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
@@ -36,13 +39,15 @@ public class JwtServiceImpl implements JwtService {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
+    private static final String USER_ID = "userId";
+
     @PostConstruct
-    public void init() throws Exception {
+    public void init() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         this.privateKey = loadPrivateKey();
         this.publicKey = loadPublicKey();
     }
 
-    private PrivateKey loadPrivateKey() throws Exception {
+    private PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String pem = readPem(privateKeyResource);
         pem = pem.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
@@ -52,7 +57,7 @@ public class JwtServiceImpl implements JwtService {
         return KeyFactory.getInstance("RSA").generatePrivate(spec);
     }
 
-    private PublicKey loadPublicKey() throws Exception {
+    private PublicKey loadPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String pem = readPem(publicKeyResource);
         pem = pem.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
@@ -62,7 +67,7 @@ public class JwtServiceImpl implements JwtService {
         return KeyFactory.getInstance("RSA").generatePublic(spec);
     }
 
-    private String readPem(Resource resource) throws Exception {
+    private String readPem(Resource resource) throws IOException {
         try (InputStream is = resource.getInputStream()) {
             return new String(is.readAllBytes());
         }
@@ -73,7 +78,7 @@ public class JwtServiceImpl implements JwtService {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("type", "access");
         if (userId != null) {
-            extraClaims.put("userId", userId);
+            extraClaims.put(USER_ID, userId);
         }
         if (roles != null) {
             extraClaims.put("roles", roles);
@@ -99,7 +104,7 @@ public class JwtServiceImpl implements JwtService {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("type", "refresh");
         if (userId != null) {
-            extraClaims.put("userId", userId);
+            extraClaims.put(USER_ID, userId);
         }
         long currentTime = System.currentTimeMillis();
         return Jwts.builder()
@@ -120,7 +125,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Long extractUserId(String token) {
         Claims claims = extractAllClaims(token);
-        Object userIdObj = claims.get("userId");
+        Object userIdObj = claims.get(USER_ID);
         if (userIdObj instanceof Number number) {
             return number.longValue();
         }
@@ -166,7 +171,7 @@ public class JwtServiceImpl implements JwtService {
     public boolean isTokenValid(String token) {
         try {
             return !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }
@@ -176,7 +181,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             final String username = extractUsername(token);
             return (username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }
@@ -185,7 +190,7 @@ public class JwtServiceImpl implements JwtService {
     public boolean isRefreshToken(String token) {
         try {
             return "refresh".equalsIgnoreCase(extractTokenType(token)) && !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }
@@ -195,7 +200,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             String type = extractTokenType(token);
             return (type == null || "access".equalsIgnoreCase(type)) && !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }

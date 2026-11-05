@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.domain.dto.request.EntryCreateRequest;
 import com.store.cosmetic.domain.dto.request.StatusUpdateRequest;
 import com.store.cosmetic.domain.dto.response.EntryResponse;
@@ -19,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class EntryServiceImpl implements EntryService {
@@ -30,6 +30,9 @@ public class EntryServiceImpl implements EntryService {
     private final ProductRepository productRepository;
     private final EntryMapper entryMapper;
     private final jakarta.servlet.http.HttpServletRequest httpServletRequest;
+
+    private static final String ENTRY_STATUS_NOT_FOUND = "Entry status not found with id: ";
+    private static final String ENTRY_NOT_FOUND = "Entry not found with id: ";
 
     public EntryServiceImpl(EntryRepository entryRepository,
                             EntryDetailRepository entryDetailRepository,
@@ -57,12 +60,12 @@ public class EntryServiceImpl implements EntryService {
     @Transactional
     public EntryResponse create(EntryCreateRequest request) {
         EntryStatus status = entryStatusRepository.findById(request.getStatusId())
-                .orElseThrow(() -> new ResourceNotFoundException("Entry status not found with id: " + request.getStatusId()));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_STATUS_NOT_FOUND + request.getStatusId()));
 
         Long currentUserId = getAuthenticatedUserId();
         LocalDateTime entryDate = request.getDate();
         if (entryDate == null && Long.valueOf(2L).equals(status.getId())) {
-            entryDate = LocalDateTime.now();
+            entryDate = LocalDateTime.now(DateTimeConfig.APP_ZONE);
         }
 
         Entry entry = Entry.builder()
@@ -111,7 +114,7 @@ public class EntryServiceImpl implements EntryService {
     @Transactional(readOnly = true)
     public EntryResponse getById(Long id) {
         Entry entry = entryRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entry not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_NOT_FOUND + id));
         List<EntryDetail> details = entryDetailRepository.findByEntryId(id);
         return entryMapper.toResponse(entry, details);
     }
@@ -131,24 +134,24 @@ public class EntryServiceImpl implements EntryService {
     @Transactional
     public EntryResponse updateStatus(Long id, StatusUpdateRequest request) {
         Entry entry = entryRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entry not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_NOT_FOUND + id));
         EntryStatus status = entryStatusRepository.findById(request.getStatusId())
-                .orElseThrow(() -> new ResourceNotFoundException("Entry status not found with id: " + request.getStatusId()));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_STATUS_NOT_FOUND + request.getStatusId()));
         Long currentUserId = getAuthenticatedUserId();
         entry.setStatus(status);
         entry.setUserUpdated(currentUserId);
 
         if (Long.valueOf(2L).equals(status.getId()) && entry.getDate() == null) {
-            entry.setDate(LocalDateTime.now());
+            entry.setDate(LocalDateTime.now(DateTimeConfig.APP_ZONE));
         } else if (Long.valueOf(3L).equals(status.getId()) || "DELETED".equalsIgnoreCase(status.getStatus())) {
             entry.setActive(false);
-            entry.setDateDeleted(LocalDateTime.now());
+            entry.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
             entry.setUserDeleted(currentUserId);
 
             List<EntryDetail> details = entryDetailRepository.findByEntryId(entry.getId());
             for (EntryDetail detail : details) {
                 detail.setActive(false);
-                detail.setDateDeleted(LocalDateTime.now());
+                detail.setDateDeleted(LocalDateTime.now(DateTimeConfig.APP_ZONE));
                 detail.setUserDeleted(currentUserId);
             }
             entryDetailRepository.saveAll(details);
@@ -163,13 +166,13 @@ public class EntryServiceImpl implements EntryService {
     @Transactional
     public void delete(Long id) {
         Entry entry = entryRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entry not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_NOT_FOUND + id));
 
         EntryStatus status = entryStatusRepository.findById(3L)
-                .orElseThrow(() -> new ResourceNotFoundException("Entry status not found with id: " + 3));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_STATUS_NOT_FOUND + 3));
 
         Long currentUserId = getAuthenticatedUserId();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(DateTimeConfig.APP_ZONE);
 
         entry.setActive(false);
         entry.setStatus(status);
@@ -198,7 +201,7 @@ public class EntryServiceImpl implements EntryService {
     @Transactional(readOnly = true)
     public EntryStatusResponse getStatusById(Long id) {
         EntryStatus status = entryStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entry status not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTRY_STATUS_NOT_FOUND + id));
         return entryMapper.toStatusResponse(status);
     }
 }
