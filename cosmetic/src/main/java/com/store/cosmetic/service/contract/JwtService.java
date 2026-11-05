@@ -2,7 +2,7 @@ package com.store.cosmetic.service.contract;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public interface JwtService {
 
     String extractTokenType(String token);
 
-    Date extractExpiration(String token);
+    LocalDateTime extractExpiration(String token);
 
     boolean isTokenValid(String token);
 

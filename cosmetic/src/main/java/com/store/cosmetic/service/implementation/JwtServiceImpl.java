@@ -1,5 +1,6 @@
 package com.store.cosmetic.service.implementation;
 
+import com.store.cosmetic.config.DateTimeConfig;
 import com.store.cosmetic.service.contract.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,7 +19,13 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
+import java.time.LocalDateTime;
+
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -150,8 +157,11 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public LocalDateTime extractExpiration(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration.toInstant()
+                .atZone(DateTimeConfig.APP_ZONE)
+                .toLocalDateTime();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -207,7 +217,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).isBefore(LocalDateTime.now(DateTimeConfig.APP_ZONE));
     }
 
     public void setPrivateKey(PrivateKey privateKey) {

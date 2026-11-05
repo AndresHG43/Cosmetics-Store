@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,9 +53,9 @@ class JwtServiceImplTest {
         assertEquals(userId, jwtService.extractUserId(token));
         assertEquals(roles, jwtService.extractRoles(token));
 
-        Date expiration = jwtService.extractExpiration(token);
+        LocalDateTime expiration = jwtService.extractExpiration(token);
         assertNotNull(expiration);
-        assertTrue(expiration.after(new Date()));
+        assertTrue(expiration.isAfter(LocalDateTime.now()));
 
         assertTrue(jwtService.isTokenValid(token));
     }
