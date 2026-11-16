@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: cosmetic
+  jackson:
+    time-zone: America/El_Salvador
+    deserialization:
+      fail-on-unknown-properties: true
+    mapper:
+      allow-coercion-of-scalars: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cosmetic_store
+    username: bGxVuYaRVxmsyyL
+    password: vZ6&C%28X$8KvBY
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate.ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  private-key-path: classpath:keys/private_key.pem
+  public-key-path: classpath:keys/public_key.pem
+  expiration: 3600000
+  refresh-expiration: 86400000
+
+app:
+  cors: http://localhost:4200,http://0.0.0.0:4200
